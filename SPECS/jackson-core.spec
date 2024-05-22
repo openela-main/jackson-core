@@ -1,8 +1,9 @@
 Name:          jackson-core
-Version:       2.10.0
+Version:       2.14.2
 Release:       1%{?dist}
 Summary:       Core part of Jackson
-License:       ASL 2.0
+License:       Apache-2.0
+
 URL:           https://github.com/FasterXML/jackson-core
 Source0:       %{url}/archive/%{name}-%{version}.tar.gz
 
@@ -11,22 +12,14 @@ BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
 BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
 
-%ifarch %{arm}
-# Speed up builds on 32bit arm in case we get such a builder
-BuildRequires: java-1.8.0-openjdk-aarch32-devel
-%endif
-
 BuildArch:      noarch
+%if 0%{?fedora}
+ExclusiveArch:  %{java_arches} noarch
+%endif
 
 %description
 Core part of Jackson that defines Streaming API as well
 as basic shared abstractions.
-
-%package javadoc
-Summary: Javadoc for %{name}
-
-%description javadoc
-This package contains API documentation for %{name}.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
@@ -35,15 +28,17 @@ This package contains API documentation for %{name}.
 %pom_remove_plugin ":maven-enforcer-plugin"
 %pom_remove_plugin "org.jacoco:jacoco-maven-plugin"
 %pom_remove_plugin "org.moditect:moditect-maven-plugin"
+%pom_remove_plugin "de.jjohannes:gradle-module-metadata-maven-plugin"
 
-cp -p src/main/resources/META-INF/LICENSE .
+%pom_add_plugin "org.apache.felix:maven-bundle-plugin" . "<extensions>true</extensions>"
+
 cp -p src/main/resources/META-INF/NOTICE .
 sed -i 's/\r//' LICENSE NOTICE
 
 %mvn_file : %{name}
 
 %build
-%mvn_build
+%mvn_build -f -j
 
 %install
 %mvn_install
@@ -52,10 +47,10 @@ sed -i 's/\r//' LICENSE NOTICE
 %doc README.md release-notes/*
 %license LICENSE NOTICE
 
-%files javadoc -f .mfiles-javadoc
-%license LICENSE NOTICE
-
 %changelog
+* Wed Nov 22 2023 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.14.2-1
+- Rebase to upstream version 2.14.2
+
 * Tue Nov 12 2019 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.10.0-1
 - Update to latest upstream release
 
