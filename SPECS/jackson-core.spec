@@ -1,11 +1,12 @@
 Name:           jackson-core
-Version:        2.14.1
-Release:        2%{?dist}
+Version:        2.19.1
+Release:        1%{?dist}
 Summary:        Core part of Jackson
 License:        Apache-2.0
 
 URL:            https://github.com/FasterXML/jackson-core
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
+Patch:          0001-Remove-ch.randelshofer.fastdoubleparser.patch
 
 BuildRequires:  maven-local
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
@@ -13,6 +14,9 @@ BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
 
 BuildArch:      noarch
+%if 0%{?fedora}
+ExclusiveArch:  %{java_arches} noarch
+%endif
 
 %description
 Core part of Jackson that defines Streaming API as well
@@ -29,16 +33,20 @@ Core part of Jackson that defines Streaming API as well
 as basic shared abstractions.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%autosetup -n %{name}-%{name}-%{version} -p 1
 
 # Remove plugins unnecessary for RPM builds
 %pom_remove_plugin ":maven-enforcer-plugin"
+%pom_remove_plugin "org.apache.maven.plugins:maven-shade-plugin"
 %pom_remove_plugin "org.jacoco:jacoco-maven-plugin"
-%pom_remove_plugin "org.moditect:moditect-maven-plugin"
-%pom_remove_plugin "de.jjohannes:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.moditect:moditect-maven-plugin"	
+%pom_remove_plugin "org.gradlex:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.cyclonedx:cyclonedx-maven-plugin"
 
-cp -p src/main/resources/META-INF/NOTICE .
-sed -i 's/\r//' LICENSE NOTICE
+%pom_remove_dep "ch.randelshofer:fastdoubleparser"
+
+cp -p src/main/resources/META-INF/jackson-core-NOTICE .
+sed -i 's/\r//' LICENSE jackson-core-NOTICE
 
 %mvn_file : %{name}
 
@@ -50,9 +58,13 @@ sed -i 's/\r//' LICENSE NOTICE
 
 %files -n pki-%{name} -f .mfiles
 %doc README.md release-notes/*
-%license LICENSE NOTICE
+%license LICENSE jackson-core-NOTICE
 
 %changelog
+* Tue Jul 15 2025 Chris Kelley <ckelley@redhat.com> - 2.19.1-1
+- Update to version 2.19.1
+- Resolves: RHEL-103636
+
 * Thu Nov 24 2022 Chris Kelley <ckelley@redhat.com> - 2.14.1-1
 - Update to version 2.14.1
 - Resolves: #2070122
