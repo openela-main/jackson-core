@@ -1,11 +1,12 @@
 Name:          jackson-core
-Version:       2.14.2
+Version:       2.19.1
 Release:       1%{?dist}
 Summary:       Core part of Jackson
 License:       Apache-2.0
 
 URL:           https://github.com/FasterXML/jackson-core
 Source0:       %{url}/archive/%{name}-%{version}.tar.gz
+Patch1:        0001-Remove-ch.randelshofer.fastdoubleparser.patch
 
 BuildRequires:  maven-local
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
@@ -23,17 +24,20 @@ as basic shared abstractions.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
+%patch -P1 -p1
 
 # Remove plugins unnecessary for RPM builds
 %pom_remove_plugin ":maven-enforcer-plugin"
+%pom_remove_plugin "org.apache.maven.plugins:maven-shade-plugin"
 %pom_remove_plugin "org.jacoco:jacoco-maven-plugin"
-%pom_remove_plugin "org.moditect:moditect-maven-plugin"
-%pom_remove_plugin "de.jjohannes:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.moditect:moditect-maven-plugin"	
+%pom_remove_plugin "org.gradlex:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.cyclonedx:cyclonedx-maven-plugin"
 
-%pom_add_plugin "org.apache.felix:maven-bundle-plugin" . "<extensions>true</extensions>"
+%pom_remove_dep "ch.randelshofer:fastdoubleparser"
 
-cp -p src/main/resources/META-INF/NOTICE .
-sed -i 's/\r//' LICENSE NOTICE
+cp -p src/main/resources/META-INF/jackson-core-NOTICE .
+sed -i 's/\r//' LICENSE jackson-core-NOTICE
 
 %mvn_file : %{name}
 
@@ -45,9 +49,13 @@ sed -i 's/\r//' LICENSE NOTICE
 
 %files -f .mfiles
 %doc README.md release-notes/*
-%license LICENSE NOTICE
+%license LICENSE jackson-core-NOTICE
 
 %changelog
+* Thu Jul 31 2025 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.19.1-1
+- Rebase to upstream version 2.19.1
+- Resolves: RHEL-103106
+
 * Wed Nov 22 2023 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.14.2-1
 - Rebase to upstream version 2.14.2
 
