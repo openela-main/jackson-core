@@ -1,5 +1,5 @@
 Name:          jackson-core
-Version:       2.19.1
+Version:       2.21.4
 Release:       1%{?dist}
 Summary:       Core part of Jackson
 License:       Apache-2.0
@@ -52,6 +52,10 @@ sed -i 's/\r//' LICENSE jackson-core-NOTICE
 %license LICENSE jackson-core-NOTICE
 
 %changelog
+* Wed Jul 08 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1
+- Rebase to version 2.21.4
+- Resolves: RHEL-188291
+
 * Thu Jul 31 2025 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.19.1-1
 - Rebase to upstream version 2.19.1
 - Resolves: RHEL-103106
