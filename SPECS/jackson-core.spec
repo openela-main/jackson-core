@@ -1,12 +1,14 @@
 Name:          jackson-core
 Version:       2.21.4
-Release:       1%{?dist}
+Release:       1%{?dist}.3
 Summary:       Core part of Jackson
 License:       Apache-2.0
 
 URL:           https://github.com/FasterXML/jackson-core
 Source0:       %{url}/archive/%{name}-%{version}.tar.gz
 Patch1:        0001-Remove-ch.randelshofer.fastdoubleparser.patch
+Patch2:        0001-Backport-1698-fix-CVE-2026-89425-Honor-maxErrorToken.patch
+Patch3:        0001-Backport-1643-fix-CVE-2026-68498-maxNameLength.patch
 
 BuildRequires:  maven-local
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
@@ -25,6 +27,8 @@ as basic shared abstractions.
 %prep
 %setup -q -n %{name}-%{name}-%{version}
 %patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
 
 # Remove plugins unnecessary for RPM builds
 %pom_remove_plugin ":maven-enforcer-plugin"
@@ -52,6 +56,18 @@ sed -i 's/\r//' LICENSE jackson-core-NOTICE
 %license LICENSE jackson-core-NOTICE
 
 %changelog
+* Wed Oct 21 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1.3
+- Fix patch order
+- Resolves: RHEL-287959
+
+* Wed Oct 21 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1.2
+- Fix CVE-2026-68498
+- Resolves: RHEL-287959
+
+* Tue Oct 20 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1.1
+- Fix CVE-2026-89425
+- Resolves: RHEL-284419
+
 * Wed Jul 08 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1
 - Rebase to version 2.21.4
 - Resolves: RHEL-188291
