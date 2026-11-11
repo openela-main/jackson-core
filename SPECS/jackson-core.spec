@@ -1,12 +1,14 @@
 Name:           jackson-core
 Version:        2.21.6
-Release:        1%{?dist}
+Release:        1%{?dist}.1
 Summary:        Core part of Jackson
 License:        Apache-2.0
 
 URL:            https://github.com/FasterXML/jackson-core
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 Patch:          0001-Remove-ch.randelshofer.fastdoubleparser.patch
+Patch:          0001-Backport-1649-fix-CVE-2026-89407-optimize-NumberInpu.patch
+Patch:          0001-Backport-1698-fix-CVE-2026-89425-Honor-maxErrorToken.patch
 
 BuildRequires:  maven-local
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
@@ -61,6 +63,12 @@ sed -i 's/\r//' LICENSE jackson-core-NOTICE
 %license LICENSE jackson-core-NOTICE
 
 %changelog
+* Thu Oct 22 2026 RHEL Packaging Agent <ipa-pki-team@redhat.com> - 2.21.6-1.1
+- Fix CVE-2026-89407: Jackson-core: Denial of Service via regular expression backtracking
+- Fix CVE-2026-89425: Jackson-core: Denial of Service via unbounded StringBuilder growth
+- Resolves: RHEL-284470
+- Resolves: RHEL-272212
+
 * Mon Sep 28 2026 IDM PKI Team <ipa-pki-team@redhat.com> - 2.21.6-1
 - Rebase to version 2.21.6
 - Resolves: RHEL-259228
